@@ -17,7 +17,7 @@ function App() {
     <div className="app">
       {/* Header */}
       <header className="header">
-        <h1>Feature Flagged Pricing Demo</h1>
+        <h1>ABC Company</h1>
       </header>
 
       {/* Hero Section */}

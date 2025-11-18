@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useFlags } from 'launchdarkly-react-client-sdk';
+import { ProfileSwitcher, userProfiles, type UserProfile } from './ProfileSwitcher';
 import './App.css';
 
 function App() {
   const { newPricingCalculator } = useFlags();
+  const [currentUser, setCurrentUser] = useState<UserProfile>(userProfiles[0]);
   const [seats, setSeats] = useState(10);
   const [plan, setPlan] = useState<'basic' | 'pro'>('basic');
   const [billing, setBilling] = useState<'monthly' | 'annual'>('monthly');
@@ -23,6 +25,7 @@ function App() {
       {/* Hero Section */}
       <section className="hero">
         <h2>Ship new pricing experiences safely with LaunchDarkly</h2>
+        <ProfileSwitcher currentUser={currentUser} onUserChange={setCurrentUser} />
       </section>
 
       {/* Pricing Section */}

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useFlags, useLDClient } from 'launchdarkly-react-client-sdk';
 import { ProfileSwitcher, userProfiles, type UserProfile } from './ProfileSwitcher';
+import { AIAssistant } from './AIAssistant';
 import './App.css';
 
 function App() {
@@ -140,6 +141,9 @@ function App() {
           </div>
         )}
       </section>
+
+      {/* AI Assistant */}
+      <AIAssistant />
     </div>
   );
 }

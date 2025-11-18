@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { useFlags } from 'launchdarkly-react-client-sdk';
+import { useFlags, useLDClient } from 'launchdarkly-react-client-sdk';
 import { ProfileSwitcher, userProfiles, type UserProfile } from './ProfileSwitcher';
 import './App.css';
 
 function App() {
   const { newPricingCalculator } = useFlags();
+  const ldClient = useLDClient();
   const [currentUser, setCurrentUser] = useState<UserProfile>(userProfiles[0]);
   const [seats, setSeats] = useState(10);
   const [plan, setPlan] = useState<'basic' | 'pro'>('basic');
@@ -14,6 +15,17 @@ function App() {
   const monthlyTotal = seats * pricePerUser;
   const annualTotal = seats * pricePerUser * 12 * 0.8;
   const savings = seats * pricePerUser * 12 - annualTotal;
+
+  // Track contact sales button click
+  const handleContactSalesClick = () => {
+    if (ldClient) {
+      console.log('📊 Tracking: contact-sales-clicked', { value: 1 });
+      ldClient.track('contact-sales-clicked', {
+        value: 1,
+      });
+    }
+    alert('Thank you! Our sales team will contact you shortly.');
+  };
 
   return (
     <div className="app">
@@ -109,6 +121,10 @@ function App() {
                 </div>
               )}
             </div>
+
+            <button className="contact-button" onClick={handleContactSalesClick}>
+              Contact Sales
+            </button>
           </div>
         ) : (
           // Legacy Pricing Blurb
@@ -118,7 +134,9 @@ function App() {
               Pricing starts at <strong>$20/user/month</strong>.
             </p>
             <p>Contact sales for more details and custom enterprise plans.</p>
-            <button className="contact-button">Contact Sales</button>
+            <button className="contact-button" onClick={handleContactSalesClick}>
+              Contact Sales
+            </button>
           </div>
         )}
       </section>

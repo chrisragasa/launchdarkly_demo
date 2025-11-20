@@ -20,10 +20,13 @@ function App() {
   // Track contact sales button click
   const handleContactSalesClick = () => {
     if (ldClient) {
-      console.log('📊 Tracking: contact-sales-clicked', { value: 1 });
-      ldClient.track('contact-sales-clicked', {
+      const eventData = {
         value: 1,
-      });
+        variation: newPricingCalculator ? 'smart-calculator' : 'legacy-pricing',
+        flagValue: newPricingCalculator,
+      };
+      console.log('📊 Tracking: contact-sales-clicked', eventData);
+      ldClient.track('contact-sales-clicked', eventData);
     }
     alert('Thank you! Our sales team will contact you shortly.');
   };

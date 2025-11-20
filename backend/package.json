@@ -1,0 +1,21 @@
+{
+  "name": "launchdarkly-ai-backend",
+  "version": "1.0.0",
+  "description": "Backend API for LaunchDarkly AI Config demo",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": ["launchdarkly", "ai", "openai"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@launchdarkly/node-server-sdk": "^9.0.0",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "openai": "^4.20.0",
+    "dotenv": "^16.3.1"
+  }
+}

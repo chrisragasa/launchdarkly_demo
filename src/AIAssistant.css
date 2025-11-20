@@ -154,6 +154,24 @@
   transform: translateX(4px);
 }
 
+.quick-question-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.loading-dots {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
 .ai-chat-footer {
   background: #f8f9fa;
   padding: 12px 20px;

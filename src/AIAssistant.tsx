@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useFlags } from 'launchdarkly-react-client-sdk';
+import type { UserProfile } from './ProfileSwitcher';
 import './AIAssistant.css';
 
 interface AIConfig {
@@ -26,32 +27,77 @@ const defaultConfig: AIConfig = {
   },
 };
 
-export function AIAssistant() {
+interface AIAssistantProps {
+  currentUser: UserProfile;
+}
+
+export function AIAssistant({ currentUser }: AIAssistantProps) {
   const flags = useFlags();
   const aiConfig: AIConfig = flags.aiAssistantConfig || defaultConfig;
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!aiConfig.enabled) {
     return null;
   }
 
   const quickQuestions = [
-    { label: 'Tell me about Basic', key: 'basic_plan' },
-    { label: 'Tell me about Pro', key: 'pro_plan' },
-    { label: 'What about annual billing?', key: 'annual_savings' },
-    { label: 'Compare plans', key: 'comparison' },
+    { label: 'Tell me about Basic', question: 'Tell me about the Basic plan' },
+    { label: 'Tell me about Pro', question: 'Tell me about the Pro plan' },
+    { label: 'What about annual billing?', question: 'What savings do I get with annual billing?' },
+    { label: 'Compare plans', question: 'Can you compare the Basic and Pro plans for me?' },
   ];
 
-  const handleQuickQuestion = (key: string) => {
-    const question = quickQuestions.find((q) => q.key === key)?.label || '';
-    const response = aiConfig.responses[key as keyof typeof aiConfig.responses];
+  const handleQuickQuestion = async (questionText: string, label: string) => {
+    // Add user message immediately
+    setMessages((prev) => [...prev, { role: 'user', content: label }]);
+    setIsLoading(true);
 
-    setMessages((prev) => [
-      ...prev,
-      { role: 'user', content: question },
-      { role: 'assistant', content: response },
-    ]);
+    try {
+      // Call backend API with full user context
+      const response = await fetch('http://localhost:3001/api/ai-chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          question: questionText,
+          userId: currentUser.key,
+          userName: currentUser.name,
+          userEmail: currentUser.email,
+          userRole: currentUser.role,
+          userRegion: currentUser.region,
+          userCountry: currentUser.country,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get AI response');
+      }
+
+      const data = await response.json();
+
+      // Log metadata for debugging
+      console.log('🤖 AI Response Metadata:', data.metadata);
+
+      // Add AI response
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: data.answer },
+      ]);
+    } catch (error) {
+      console.error('AI Error:', error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: '❌ Sorry, I encountered an error. Please make sure the backend server is running.',
+        },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleReset = () => {
@@ -71,7 +117,6 @@ export function AIAssistant() {
           <div className="ai-chat-header">
             <div>
               <strong>AI Pricing Assistant</strong>
-              <span className="personality-badge">{aiConfig.personality}</span>
             </div>
             <button onClick={handleReset} className="reset-button">
               🔄 Reset
@@ -91,31 +136,27 @@ export function AIAssistant() {
               </div>
             ))}
 
-            {/* Quick Questions */}
-            {messages.length === 0 && (
-              <div className="quick-questions">
-                <p className="quick-questions-label">Quick questions:</p>
-                {quickQuestions.map((q) => (
-                  <button
-                    key={q.key}
-                    className="quick-question-btn"
-                    onClick={() => handleQuickQuestion(q.key)}
-                  >
-                    {q.label}
-                  </button>
-                ))}
+            {/* Loading indicator */}
+            {isLoading && (
+              <div className="ai-message assistant">
+                <div className="message-content">
+                  <span className="loading-dots">Thinking...</span>
+                </div>
               </div>
             )}
 
-            {/* Show quick questions after responses too */}
-            {messages.length > 0 && (
+            {/* Quick Questions */}
+            {!isLoading && (
               <div className="quick-questions">
-                <p className="quick-questions-label">Ask another:</p>
-                {quickQuestions.map((q) => (
+                <p className="quick-questions-label">
+                  {messages.length === 0 ? 'Quick questions:' : 'Ask another:'}
+                </p>
+                {quickQuestions.map((q, idx) => (
                   <button
-                    key={q.key}
+                    key={idx}
                     className="quick-question-btn"
-                    onClick={() => handleQuickQuestion(q.key)}
+                    onClick={() => handleQuickQuestion(q.question, q.label)}
+                    disabled={isLoading}
                   >
                     {q.label}
                   </button>
@@ -126,7 +167,8 @@ export function AIAssistant() {
 
           <div className="ai-chat-footer">
             <small>
-              💡 Powered by LaunchDarkly AI Configs - Try switching users or changing flag variations!
+              🤖 Powered by LaunchDarkly AI Configs + OpenAI
+              {isLoading && ' • Generating response...'}
             </small>
           </div>
         </div>

@@ -143,7 +143,7 @@ function App() {
       </section>
 
       {/* AI Assistant */}
-      <AIAssistant />
+      <AIAssistant currentUser={currentUser} />
     </div>
   );
 }

@@ -11,6 +11,7 @@
   font-weight: 600;
   margin-right: 0.75rem;
   font-size: 0.95rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
 }
 
 .profile-switcher select {
@@ -24,6 +25,7 @@
   cursor: pointer;
   transition: all 0.2s;
   min-width: 250px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
 }
 
 .profile-switcher select:hover {
@@ -40,9 +42,11 @@
 .user-info {
   margin-top: 0.5rem;
   opacity: 0.9;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
 }
 
 .user-info small {
   font-size: 0.85rem;
   font-weight: 400;
+  font-family: inherit;
 }

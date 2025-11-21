@@ -27,28 +27,15 @@ A production-ready demonstration of LaunchDarkly's core capabilities including f
 
 ## 🚀 Quick Start
 
-### Prerequisites
-- Node.js 18+ installed
-- LaunchDarkly account (free trial available)
-- OpenAI API key (optional, for AI features)
+```bash
+# 1. Install dependencies
+npm install
 
-### Installation
+# 2. Create .env.local with your LaunchDarkly client-side ID
+echo "VITE_LD_CLIENT_SIDE_ID=your-client-side-id" > .env.local
 
-1. **Install dependencies:**
-   ```bash
-   npm install
-   cd backend && npm install && cd ..
-   ```
-
-2. **Configure environment variables:**
-   
-   **Frontend** (`.env` in project root):
-   ```bash
-   VITE_LD_CLIENT_SIDE_ID=your-client-side-id-here
-   ```
-   
-   **Backend** (`backend/.env` - optional, for AI features):
-   ```bash
+# 3. Run the app
+npm run dev
    LD_SDK_KEY=your-server-sdk-key-here
    OPENAI_API_KEY=your-openai-api-key-here
    PORT=3001

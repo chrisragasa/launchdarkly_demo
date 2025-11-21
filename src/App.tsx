@@ -31,6 +31,76 @@ function App() {
     alert('Thank you! Our sales team will contact you shortly.');
   };
 
+  // Simulate traffic for experimentation
+  const simulateTraffic = async () => {
+    if (!ldClient) return;
+
+    const numUsers = 35; // Generate 35 random users
+    const roles = ['guest', 'basic', 'pro', 'enterprise'];
+    const regions = ['US-East', 'US-West', 'EU-West', 'APAC'];
+    const countries = ['USA', 'UK', 'Germany', 'Singapore', 'Canada', 'Australia'];
+
+    console.log(`🚀 Starting traffic simulation: ${numUsers} users...`);
+
+    for (let i = 0; i < numUsers; i++) {
+      const randomRole = roles[Math.floor(Math.random() * roles.length)];
+      const randomRegion = regions[Math.floor(Math.random() * regions.length)];
+      const randomCountry = countries[Math.floor(Math.random() * countries.length)];
+      
+      const randomUser = {
+        kind: 'user',
+        key: `simulated-user-${Date.now()}-${i}`,
+        name: `Simulated User ${i}`,
+        email: `user${i}@simulated.com`,
+        role: randomRole,
+        region: randomRegion,
+        country: randomCountry,
+      };
+
+      // Identify the user
+      await ldClient.identify(randomUser);
+
+      // Wait for flag evaluation to complete
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      // Get the flag value for this user
+      const flagValue = ldClient.variation('new-pricing-calculator', false);
+
+      // 30% chance they click "Contact Sales"
+      if (Math.random() < 0.3) {
+        ldClient.track('contact-sales-clicked', {
+          value: 1,
+          variation: flagValue ? 'smart-calculator' : 'legacy-pricing',
+          flagValue: flagValue,
+        });
+      }
+
+      // Flush events every 25 users to ensure they're sent
+      if ((i + 1) % 25 === 0) {
+        await ldClient.flush();
+        console.log(`✅ Generated ${i + 1}/${numUsers} users... (flushed to LaunchDarkly)`);
+      }
+    }
+
+    // Final flush to send remaining events
+    await ldClient.flush();
+
+    // Switch back to current user
+    await ldClient.identify({
+      kind: 'user',
+      key: currentUser.key,
+      name: currentUser.name,
+      email: currentUser.email,
+      role: currentUser.role,
+      region: currentUser.region,
+      country: currentUser.country,
+    });
+
+    console.log(`🎉 Traffic simulation complete! Generated ${numUsers} users with ~30% conversion rate.`);
+    console.log(`📊 Events have been flushed to LaunchDarkly. Wait 1-2 minutes for data to appear in the experiment.`);
+    alert(`✅ Successfully simulated ${numUsers} users!\n\nWait 1-2 minutes, then refresh your LaunchDarkly experiment dashboard to see results.`);
+  };
+
   return (
     <div className="app">
       {/* Header */}
@@ -152,6 +222,11 @@ function App() {
 
       {/* AI Assistant */}
       <AIAssistant currentUser={currentUser} />
+
+      {/* Traffic Simulator */}
+      <button className="traffic-simulator" onClick={simulateTraffic}>
+        🚀 Simulate Traffic (35 users)
+      </button>
     </div>
   );
 }

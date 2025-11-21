@@ -85,10 +85,21 @@ app.post('/api/ai-chat', async (req, res) => {
       null // No default value; we'll use fallback config below
     );
 
-    console.log('🚀 AI Config received:', aiConfig ? 'Found' : 'Using default');
+    console.log('\n========================================');
+    console.log('🤖 AI CONFIG EVALUATION');
+    console.log('========================================');
+    console.log('👤 User:', userName, `(${userId})`);
+    console.log('📧 Email:', userEmail);
+    console.log('🏷️  Role:', userRole);
+    console.log('🌍 Region:', userRegion, '-', userCountry);
+    console.log('----------------------------------------');
+    console.log('🚀 AI Config received:', aiConfig ? '✅ Found' : '❌ Using default');
+    console.log('🎭 Variation Key:', aiConfig?._ldMeta?.variationKey || 'default-fallback');
+    console.log('📦 Variation Name:', aiConfig?._ldMeta?.variationName || 'N/A');
     if (aiConfig) {
-      console.log('📦 Full AI Config:', JSON.stringify(aiConfig, null, 2));
+      console.log('📝 Full AI Config:', JSON.stringify(aiConfig, null, 2));
     }
+    console.log('========================================\n');
 
     // Fallback configuration if LaunchDarkly is unavailable or flag doesn't exist
     const defaultConfig = {

@@ -1,46 +1,18 @@
 import { useState } from 'react';
-import { useFlags } from 'launchdarkly-react-client-sdk';
 import type { UserProfile } from './ProfileSwitcher';
 import './AIAssistant.css';
-
-interface AIConfig {
-  enabled: boolean;
-  personality: string;
-  greeting: string;
-  responses: {
-    basic_plan: string;
-    pro_plan: string;
-    annual_savings: string;
-    comparison: string;
-  };
-}
-
-const defaultConfig: AIConfig = {
-  enabled: true,  // Changed to true so it shows by default
-  personality: 'friendly',
-  greeting: '👋 Hi! Ask me about pricing!',
-  responses: {
-    basic_plan: 'Basic plan is $20/user/month.',
-    pro_plan: 'Pro plan is $40/user/month.',
-    annual_savings: 'Annual billing saves 20%.',
-    comparison: 'Basic is $20/mo, Pro is $40/mo.',
-  },
-};
 
 interface AIAssistantProps {
   currentUser: UserProfile;
 }
 
 export function AIAssistant({ currentUser }: AIAssistantProps) {
-  const flags = useFlags();
-  const aiConfig: AIConfig = flags.aiAssistantConfig || defaultConfig;
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  if (!aiConfig.enabled) {
-    return null;
-  }
+  // Note: AI Configs are evaluated server-side, not client-side
+  // The backend handles the AI Config evaluation based on user context
 
   const quickQuestions = [
     { label: 'Tell me about Basic', question: 'Tell me about the Basic plan' },
@@ -126,7 +98,7 @@ export function AIAssistant({ currentUser }: AIAssistantProps) {
           <div className="ai-chat-messages">
             {/* Greeting Message */}
             <div className="ai-message assistant">
-              <div className="message-content">{aiConfig.greeting}</div>
+              <div className="message-content">👋 Hi! Ask me about pricing!</div>
             </div>
 
             {/* Conversation Messages */}

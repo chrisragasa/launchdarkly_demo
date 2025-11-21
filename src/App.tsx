@@ -5,7 +5,7 @@ import { AIAssistant } from './AIAssistant';
 import './App.css';
 
 function App() {
-  const { newPricingCalculator } = useFlags();
+  const { newPricingCalculator, thirtyDayFreeTrial } = useFlags();
   const ldClient = useLDClient();
   const [currentUser, setCurrentUser] = useState<UserProfile>(userProfiles[0]);
   const [seats, setSeats] = useState(10);
@@ -36,6 +36,11 @@ function App() {
       {/* Header */}
       <header className="header">
         <h1>ABC Company</h1>
+        {thirtyDayFreeTrial && (
+          <button className="free-trial-button">
+            Start 30-Day Free Trial
+          </button>
+        )}
       </header>
 
       {/* Hero Section */}
